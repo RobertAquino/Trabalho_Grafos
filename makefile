@@ -1,14 +1,14 @@
 # Nome do executável
 MAIN := main
 
-# Objetos a serem gerados (cada .cpp vira um .o)
-OBJECTS := main.o graph.o parser.o
+# Objetos a serem gerados. 
+# Adicionei os nomes baseados nos seus arquivos atuais e na lógica de Setup que vamos implementar.
+OBJECTS := main.o 
 
 # Flags de compilação para C++
-# -Wall e -Wextra mostram avisos úteis do compilador
 FLAGS := -Wall -Wextra -std=c++17 -g
 
-# Definição do compilador: para C++, usamos g++
+# Definição do compilador
 CC := g++
 
 # Ajustando parâmetros ao sistema operacional
@@ -24,21 +24,16 @@ endif
 all: $(OUTPUTMAIN)
 	@echo Compilacao completa!
 
-# Gerando o arquivo executável final ligando os objetos
+# Gerando o arquivo executável final
+# Como você está usando apenas arquivos .hpp (templates/headers inline), 
+# muitas vezes basta compilar o main.cpp que inclui todos eles.
 $(OUTPUTMAIN): $(OBJECTS)
 	$(CC) $(FLAGS) $(OBJECTS) -o $(OUTPUTMAIN)
 
-# Compilando o main.o (depende dos headers para saber as definicoes)
-main.o: main.cpp graph.hpp parser.hpp
+# Compilando o main.o
+# Adicionei as dependências corretas de acordo com as suas pastas
+main.o: main.cpp ./Bibliotecas/Estruturas.hpp ./Bibliotecas/Parser_JobInfo.hpp ./Bibliotecas/Parser_Operation.hpp ./Bibliotecas/Graph_Builder.hpp
 	$(CC) $(FLAGS) -c main.cpp
-
-# Compilando o graph.o
-graph.o: graph.cpp graph.hpp
-	$(CC) $(FLAGS) -c graph.cpp
-
-# Compilando o parser.o
-parser.o: parser.cpp parser.hpp graph.hpp
-	$(CC) $(FLAGS) -c parser.cpp
 
 # Limpeza dos arquivos temporários
 clean:

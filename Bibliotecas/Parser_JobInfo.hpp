@@ -4,6 +4,7 @@
 
 class JobParser
 {
+public:
     vector<JobInfo> inicializaParser(string caminho);
 };
 
@@ -16,7 +17,7 @@ vector<JobInfo> JobParser::inicializaParser(string caminho)
     if (!arquivo.is_open())
     {
         cout << "Erro na abertura do arquivo";
-        return;
+        return lista_job;
     }
 
     string linha;
