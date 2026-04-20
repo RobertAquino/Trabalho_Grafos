@@ -21,8 +21,8 @@ vector<Operacao> OperationsParser::inicializaParser(string caminho)
     }
     string linha;
 
-    int id_global = 0;
-    int id_atual = 0;
+    int id_operacao = 0;
+    int job = 0;
     while (getline(arquivo, linha))
     {
         stringstream separator(linha);
