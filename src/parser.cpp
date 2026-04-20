@@ -7,7 +7,19 @@
 
 vector<Operation> readOperations(string FileName)
 {
-    vector<Operation> list;
+    vector<Operation> list;geraJobOperation()#ifndef GERAR_INSTANCIAS_HPP
+#define GERAR_INSTANCIAS_HPP
+
+#include "Estruturas.hpp"
+
+void Instancia::configurar(int n_maquinas, int n_jobs)
+{
+    matriz_setup.resize(n_maquinas, vector<vector<int>>(n_jobs, vector<int>(n_jobs, 0)));
+    estado_inicial.resize(n_maquinas, 0);
+}
+void geraJobOperation();
+
+#endif
     ifstream file(FileName);
     string line;
 

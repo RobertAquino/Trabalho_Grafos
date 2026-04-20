@@ -34,17 +34,17 @@ vector<Operacao> OperationsParser::inicializaParser(string caminho)
         {
             Operacao operacao_atual;
 
-            operacao_atual.id_maquina = stoi(id_maquina);
+            operacao_atual.maquina = stoi(id_maquina);
             operacao_atual.tempo_processamento = stoi(tempo);
-            operacao_atual.id_job = id_atual;
-            operacao_atual.id = id_global;
-            operacao_atual.grau_entrada = 0;
-            operacao_atual.tempo_mais_cedo = 0;
+            operacao_atual.id_job = job;
+            operacao_atual.id = id_operacao;
+            // Lidar com isso mais tarde
+            operacao_atual.tempo_setup = 0;
             lista_operacoes.push_back(operacao_atual);
-            id_global++;
+            id_operacao++;
         }
 
-        id_atual++;
+        job++;
     }
 
     arquivo.close();
