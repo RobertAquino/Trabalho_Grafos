@@ -82,5 +82,22 @@ struct Grafo
     }
 };
 
+// Tabela de Setup
+struct TabelaSetup
+{
+    // [Maquina][Job_Anterior][Job Atual]
+    int transicoes[10][10][10];
+
+    // [Maquina] -> Job inicial que ela contém
+    int estado_inicial[10];
+
+    // Inicializa tudo com zero para evitar lixo de memória
+    TabelaSetup()
+    {
+        memset(transicoes, 0, sizeof(transicoes));
+        memset(estado_inicial, 0, sizeof(estado_inicial));
+    }
+};
+
 */
 #endif

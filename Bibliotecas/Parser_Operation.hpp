@@ -4,6 +4,7 @@
 
 class OperationsParser
 {
+public:
     vector<Operacao> inicializaParser(string caminho);
 };
 
@@ -16,7 +17,7 @@ vector<Operacao> OperationsParser::inicializaParser(string caminho)
     if (!arquivo.is_open())
     {
         cout << "Erro na abertura do arquivo";
-        return;
+        return lista_operacoes;
     }
     string linha;
 
