@@ -9,7 +9,25 @@
 
 using namespace std;
 
-// 1. Etiqueta da Seta (Crucial para a Heurística da Fase 5)
+// 4. O Contrato Financeiro (Arquivo jobs.csv)
+class JobInfo
+{
+    int id_job;
+    int release_date;
+    double due_date;
+    double earliness_penalty;
+    double tardiness_penalty;
+    double flow_time_penalty;
+};
+class Operacao
+{
+    JobInfo job;
+    int maquina;
+    int tempo_processamento;
+    int tempo_setup;
+};
+
+/*// 1. Etiqueta da Seta (Crucial para a Heurística da Fase 5)
 enum TipoSeta
 {
     ARESTA_ORIGINAL, // Aresta fixa (imutável)
@@ -64,4 +82,5 @@ struct Grafo
     }
 };
 
+*/
 #endif
