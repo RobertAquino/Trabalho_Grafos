@@ -10,7 +10,6 @@
 
 using namespace std;
 
-// 4. O Contrato Financeiro (Arquivo jobs.csv)
 class JobInfo
 {
 public:
@@ -41,14 +40,23 @@ public:
     vector<int> tempoProcessamento;
     vector<int> operToJob;
     vector<int> operToMach;
-    vector<vector<Operacao>> jobOperation;
-    vector<vector<Operacao>> machOperation;
+    vector<vector<int>> jobOperation;
+    vector<vector<int>> machOperation;
+    vector<int> jobAntecessor;
+    vector<int> jobSucessor;
+    vector<int> machAntecessor;
+    vector<int> machSucessor;
 
     void geraOperToJob(const vector<Operacao> &lista_operacoes);
     void geraOperToMach(const vector<Operacao> &lista_operacoes);
-    void geraJobOper(const vector<int> operToJob, const vector<Operacao> &lista_operacoes);
-    void geraMachOper(const vector<int> operToMach, const vector<Operacao> &lista_operacoes);
+    void geraJobOper(const vector<Operacao> &lista_operacoes);
+    void geraMachOper(const vector<Operacao> &lista_operacoes);
     void geraTempoProcessamento(const vector<Operacao> &lista_operacoes);
+    void geraJobAntecessor();
+    void geraJobSucessor();
+    void geraMachAntecessor();
+    void geraMachSucessor();
+    void inicializaEstruturas();
     // Prepara o espaço na memória
     void configurar(int n_maquinas, int n_jobs);
 };

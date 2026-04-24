@@ -1,5 +1,6 @@
 #ifndef PARSER_ARESTA
 #define PARSER_ARESTA
+#include <algorithm>
 #include "Estruturas.hpp"
 
 class OperationsParser
@@ -48,6 +49,8 @@ vector<Operacao> OperationsParser::inicializaParser(string caminho)
     }
 
     arquivo.close();
+    // perguntar Tadeu se pode
+    sort(lista_operacoes.begin(), lista_operacoes.end());
     return lista_operacoes;
 }
 #endif
