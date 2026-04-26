@@ -3,6 +3,7 @@
 
 #include "../Bibliotecas/Estruturas.hpp"
 #include "../Bibliotecas/Parser_Operation.hpp"
+#include "../Bibliotecas/Parser_Setup.hpp"
 
 void Instancia::configurar(int n_maquinas, int n_jobs)
 {
@@ -13,6 +14,7 @@ void Instancia::configurar(int n_maquinas, int n_jobs)
     operToMach.resize(n_maquinas);
     jobAntecessor.resize((n_maquinas * n_jobs), -1);
     jobSucessor.resize((n_maquinas * n_jobs), -1);
+    tempo_final_job.resize(n_jobs, -1);
 }
 
 void Instancia::geraOperToJob(const vector<Operacao> &lista_operacoes)
@@ -80,54 +82,75 @@ void Instancia::geraTempoProcessamento(const vector<Operacao> &lista_operacoes)
 }
 void Instancia::geraJobAntecessor()
 {
+    int id_atual;
+    int id_anterior;
     for (const auto &fila_de_job : jobOperation)
     {
         for (int i = 1; i < fila_de_job.size() - 1; i++)
         {
-            jobAntecessor[i] = fila_de_job[i - 1];
+            id_atual = fila_de_job[i];
+            id_anterior = fila_de_job[i - 1];
+            jobAntecessor[id_atual] = id_anterior;
         }
     }
 }
 void Instancia::geraJobSucessor()
 {
+    int id_atual;
+    int id_sucessor;
     for (const auto &fila_de_job : jobOperation)
     {
         for (int i = 0; i < fila_de_job.size() - 2; i++)
         {
-            jobSucessor[i] = fila_de_job[i + 1];
+            id_atual = fila_de_job[i];
+            id_sucessor = fila_de_job[i + 1];
+            jobSucessor[id_atual] = id_sucessor;
         }
     }
 }
 void Instancia::geraMachAntecessor()
 {
+    int id_atual;
+    int id_anterior;
     for (const auto &fila_de_maquina : machOperation)
     {
         for (int i = 1; i < fila_de_maquina.size() - 1; i++)
         {
-            jobAntecessor[i] = fila_de_maquina[i - 1];
+            id_atual = fila_de_maquina[i];
+            id_anterior = fila_de_maquina[i - 1];
+            machAntecessor[id_atual] = id_anterior;
         }
     }
 }
 void Instancia::geraMachSucessor()
 {
+    int id_atual;
+    int id_sucessor;
     for (const auto &fila_de_maquina : machOperation)
     {
         for (int i = 1; i < fila_de_maquina.size() - 1; i++)
         {
-            jobAntecessor[i] = fila_de_maquina[i - 1];
+            id_atual = fila_de_maquina[i];
+            id_sucessor = fila_de_maquina[i + 1];
+            machSucessor[id_atual] = id_sucessor;
         }
     }
 }
-void inicializaEstruturas()
+void Instancia::inicializaEstruturas(string caminho, int n_maquinas, int n_jobs)
 {
-    void geraOperToJob(const vector<Operacao> &lista_operacoes);
-    void geraOperToMach(const vector<Operacao> &lista_operacoes);
-    void geraJobOper(const vector<Operacao> &lista_operacoes);
-    void geraMachOper(const vector<Operacao> &lista_operacoes);
-    void geraTempoProcessamento(const vector<Operacao> &lista_operacoes);
-    void geraJobAntecessor();
-    void geraJobSucessor();
-    void geraMachAntecessor();
-    void geraMachSucessor();
+    configurar(n_maquinas, n_jobs);
+    OperationsParser operationsParser;
+    vector<Operacao> lista_operacoes = operationsParser.inicializaParser(caminho);
+    SetupParser parserSetup;
+    parserSetup.carregarSetup(caminho, matriz_setup);
+    geraOperToJob(lista_operacoes);
+    geraOperToMach(lista_operacoes);
+    geraJobOper(lista_operacoes);
+    geraMachOper(lista_operacoes);
+    geraTempoProcessamento(lista_operacoes);
+    geraJobAntecessor();
+    geraJobSucessor();
+    geraMachAntecessor();
+    geraMachSucessor();
 }
 #endif

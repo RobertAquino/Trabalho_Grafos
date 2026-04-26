@@ -6,13 +6,13 @@
 class SetupParser
 {
 public:
-    void carregarSetup(string caminho, Instancia &objetoSetup);
+    void carregarSetup(string caminho, vector<vector<vector<int>>> matriz_setup);
 
     void carregarInitialSetup(string caminho, Instancia &objetoSetup);
 };
 #endif
 
-void SetupParser::carregarSetup(string caminho, Instancia &objetoSetup)
+void SetupParser::carregarSetup(string caminho, vector<vector<vector<int>>> matriz_setup)
 {
     ifstream arquivo(caminho);
     string linha;
@@ -42,7 +42,7 @@ void SetupParser::carregarSetup(string caminho, Instancia &objetoSetup)
             int job2 = stoi(j2);
             int tempo = stoi(t);
 
-            objetoSetup.matriz_setup[mach][job1][job2] = tempo;
+            matriz_setup[mach][job1][job2] = tempo;
         }
     }
     arquivo.close();

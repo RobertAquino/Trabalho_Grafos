@@ -46,6 +46,7 @@ public:
     vector<int> jobSucessor;
     vector<int> machAntecessor;
     vector<int> machSucessor;
+    vector<int> tempo_final_job;
 
     void geraOperToJob(const vector<Operacao> &lista_operacoes);
     void geraOperToMach(const vector<Operacao> &lista_operacoes);
@@ -56,7 +57,7 @@ public:
     void geraJobSucessor();
     void geraMachAntecessor();
     void geraMachSucessor();
-    void inicializaEstruturas();
+    void inicializaEstruturas(string caminho, int n_maquinas, int n_jobs);
     // Prepara o espaço na memória
     void configurar(int n_maquinas, int n_jobs);
 };
