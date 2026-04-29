@@ -1,58 +1,66 @@
-#ifndef OPERATIONS_PARSER
-#define OPERATIONS_PARSER
+#ifndef JOBINFO_PARSER_HPP // <-- Nome arrumado!
+#define JOBINFO_PARSER_HPP
+
 #include "Estruturas.hpp"
+#include <fstream>
+#include <sstream>
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
 
 class JobParser
 {
 public:
-    vector<JobInfo> inicializaParser(string caminho);
-};
-
-vector<JobInfo> JobParser::inicializaParser(string caminho)
-{
-    vector<JobInfo> lista_job;
-
-    ifstream arquivo(caminho);
-
-    if (!arquivo.is_open())
+    // Colocando a função diretamente dentro da classe evita erros de Linkagem!
+    vector<JobInfo> inicializaParser(std::string caminho)
     {
-        cout << "Erro na abertura do arquivo";
+        vector<JobInfo> lista_job;
+
+        ifstream arquivo(caminho);
+
+        if (!arquivo.is_open())
+        {
+            cout << "Erro na abertura do arquivo: " << caminho << std::endl;
+            return lista_job;
+        }
+
+        string linha;
+
+        // Pula o cabeçalho
+        getline(arquivo, linha);
+
+        while (getline(arquivo, linha))
+        {
+            stringstream separador(linha);
+            string dado;
+            JobInfo job_atual;
+
+            getline(separador, dado, ',');
+            job_atual.id_job = std::stoi(dado);
+
+            getline(separador, dado, ',');
+            job_atual.release_date = std::stoi(dado);
+
+            getline(separador, dado, ',');
+            job_atual.due_date = std::stod(dado);
+
+            getline(separador, dado, ',');
+            job_atual.earliness_penalty = std::stod(dado);
+
+            getline(separador, dado, ',');
+            job_atual.tardiness_penalty = std::stod(dado);
+
+            getline(separador, dado, ',');
+            job_atual.flow_time_penalty = std::stod(dado);
+
+            lista_job.push_back(job_atual);
+        }
+
+        arquivo.close();
         return lista_job;
     }
-
-    string linha;
-
-    getline(arquivo, linha);
-
-    while (getline(arquivo, linha))
-    {
-        stringstream separador(linha);
-        string dado;
-        JobInfo job_atual;
-
-        getline(separador, dado, ',');
-        job_atual.id_job = stoi(dado);
-
-        getline(separador, dado, ',');
-        job_atual.release_date = stoi(dado);
-
-        getline(separador, dado, ',');
-        job_atual.due_date = stod(dado);
-
-        getline(separador, dado, ',');
-        job_atual.earliness_penalty = stod(dado);
-
-        getline(separador, dado, ',');
-        job_atual.tardiness_penalty = stod(dado);
-
-        getline(separador, dado, ',');
-        job_atual.flow_time_penalty = stod(dado);
-
-        lista_job.push_back(job_atual);
-    }
-
-    arquivo.close();
-    return lista_job;
-}
+};
 
 #endif
