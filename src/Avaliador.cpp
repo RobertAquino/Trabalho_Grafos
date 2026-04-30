@@ -3,7 +3,7 @@
 #include "../Bibliotecas/Parser_JobInfo.hpp"
 #include <queue>
 
-// calcula o máximo entre dois valore
+// calcula o máximo entre dois valores
 double max(double a, double b)
 {
     return (a > b) ? a : b;
@@ -77,7 +77,7 @@ vector<double> avaliador(int total_operations, string caminho,
         double desocupa_maquina_atual = 0;
 
         // Uma vez que a operação atual pode não depender apenas de uma operação anterior de mesmo job,
-        // mas de uma máquina que fui usada anteriormente por uma operação de outro job,
+        // mas de uma máquina que foi usada anteriormente por uma operação de outro job,
         // o tempo inicial é o valor máximo entre o tempo final da operação do mesmo job ou da
         // operação de job diferente
         if (instancia.machAntecessor[atual] != -1)
