@@ -155,19 +155,19 @@ vector<double> calcula_custo_total(string caminho, int n_jobs, int n_maquinas, d
         if (job_atual == lista_job[i].due_date)
             tempo_multas_job[i] = tempo_final_job[i];
 
-        double diferença = lista_job[i].due_date - tempo_final_job[i];
+        double diferenca = lista_job[i].due_date - tempo_final_job[i];
 
         // Se houver atraso, calculamos a multa em relação o periodo de atraso
-        if (diferença < 0)
+        if (diferenca < 0)
         {
-            double temp = (diferença * lista_job[i].tardiness_penalty) * (-1);
+            double temp = (diferenca * lista_job[i].tardiness_penalty) * (-1);
             tempo_multas_job[i] = tempo_final_job[i] + temp;
         }
 
         // Se houver adiamento, calculamos a multa em relação o periodo de adiamento
         else
         {
-            double temp = diferença * lista_job[i].earliness_penalty;
+            double temp = diferenca * lista_job[i].earliness_penalty;
             tempo_multas_job[i] = tempo_final_job[i] + temp;
         }
     }

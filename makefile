@@ -1,46 +1,32 @@
-# Nome do executável
 MAIN := main
-
-# Objetos a serem gerados. 
-# Adicionei os nomes baseados nos seus arquivos atuais e na lógica de Setup que vamos implementar.
+# MANTENHA APENAS O main.o aqui
 OBJECTS := main.o 
-
-# Flags de compilação para C++
 FLAGS := -Wall -Wextra -std=c++17 -g
-
-# Definição do compilador
 CC := g++
 
-# Ajustando parâmetros ao sistema operacional
 ifeq ($(OS), Windows_NT)
     OUTPUTMAIN := main.exe
     RM := del /q /f
+    EXEC := $(OUTPUTMAIN)
 else
     OUTPUTMAIN := main.out
     RM := rm -f
+    EXEC := ./$(OUTPUTMAIN)
 endif
 
-# Ponto de compilação principal
 all: $(OUTPUTMAIN)
 	@echo Compilacao completa!
 
-# Gerando o arquivo executável final
-# Como você está usando apenas arquivos .hpp (templates/headers inline), 
-# muitas vezes basta compilar o main.cpp que inclui todos eles.
 $(OUTPUTMAIN): $(OBJECTS)
 	$(CC) $(FLAGS) $(OBJECTS) -o $(OUTPUTMAIN)
 
-# Compilando o main.o
-# Adicionei as dependências corretas de acordo com as suas pastas
-main.o: main.cpp ./Bibliotecas/Estruturas.hpp ./Bibliotecas/Parser_JobInfo.hpp ./Bibliotecas/Parser_Operation.hpp ./Bibliotecas/Graph_Builder.hpp
-	$(CC) $(FLAGS) -c main.cpp
+# A regra de compilação do main agora "carrega" o peso dos .cpp incluídos
+main.o: main.cpp
+	$(CC) $(FLAGS) -c main.cpp -o main.o
 
-# Limpeza dos arquivos temporários
 clean:
-	$(RM) $(OBJECTS)
-	$(RM) $(OUTPUTMAIN)
-	@echo Limpeza completa!!!
+	@if exist main.o del /q /f main.o
+	@if exist $(OUTPUTMAIN) del /q /f $(OUTPUTMAIN)
 
-# Comando para compilar e rodar direto
 run: all
-	./$(OUTPUTMAIN)
+	$(EXEC)
