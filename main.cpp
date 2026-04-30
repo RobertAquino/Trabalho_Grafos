@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <dirent.h>
 #include "./Bibliotecas/Estruturas.hpp"
 #include "./Bibliotecas/Parser_JobInfo.hpp"
 #include "./src/Instancias.cpp"
@@ -12,36 +13,57 @@ int main()
 {
     int n_jobs = 10;
     int n_machines = 10;
-    double makespan = 0;
 
-    string arquivo_jobs = "jobs.csv";
-    string arquivo_operacoes = "operations.csv";
-    string arquivo_setup = "setup.csv";
-    string arquivo_setup_inicial = "initial_setup.csv";
+    // Caminho base - Importante: No Windows use barras normais '/' ou duplas '\\'
+    string caminho_base = "Pasta do git_Brandimarte/just-in-time-jss-setup-times/instancias_100/";
 
-    cout << "--- Iniciando Execucao da Instancia ---" << endl;
+    DIR *dir;
+    struct dirent *ent;
 
-    // A função calcula_custo_total já encapsula a chamada do avaliador e dos parsers internos
-    vector<double> custos_por_job = calcula_custo_total(
-        arquivo_operacoes,
-        n_jobs,
-        n_machines,
-        makespan);
+    cout << "--- INICIANDO PROCESSAMENTO ---" << endl;
 
-    cout << "\nRESULTADOS DA SIMULACAO:" << endl;
-    cout << "Makespan Total (Cmax): " << makespan << " unidades de tempo." << endl;
-    cout << "---------------------------------------" << endl;
-    cout << "Custo Individual (Tempo + Penalidades):" << endl;
-
-    double custo_total_sistema = 0;
-    for (int i = 0; i < n_jobs; i++)
+    // Abre o diretório principal
+    if ((dir = opendir(caminho_base.c_str())) != NULL)
     {
-        cout << "Job [" << i << "]: " << custos_por_job[i] << endl;
-        custo_total_sistema += custos_por_job[i];
-    }
+        // Percorre todos os arquivos e pastas dentro dele
+        while ((ent = readdir(dir)) != NULL)
+        {
+            string nome_pasta = ent->d_name;
 
-    cout << "---------------------------------------" << endl;
-    cout << "CUSTO TOTAL DO SCHEDULING: " << custo_total_sistema << endl;
+            // Filtra para pegar apenas pastas que comecem com "instancia_"
+            // e ignora os diretórios "." e ".."
+            if (nome_pasta.find("instancia_") != string::npos)
+            {
+
+                string caminho_completo = caminho_base + nome_pasta;
+                double makespan = 0;
+
+                // Monta o caminho dos arquivos
+                string arquivo_operacoes = caminho_completo + "/operations.csv";
+
+                cout << "\n>>> Executando: " << nome_pasta << endl;
+
+                // Chama sua função de cálculo
+                vector<double> custos = calcula_custo_total(
+                    arquivo_operacoes,
+                    n_jobs,
+                    n_machines,
+                    makespan);
+
+                double soma = 0;
+                for (double c : custos)
+                    soma += c;
+
+                cout << "  Makespan: " << makespan << " | Custo: " << soma << endl;
+            }
+        }
+        closedir(dir);
+    }
+    else
+    {
+        // Se cair aqui, o caminho_base está errado
+        cout << "Erro: Nao foi possivel abrir a pasta: " << caminho_base << endl;
+    }
 
     return 0;
 }
