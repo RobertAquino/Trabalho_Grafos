@@ -43,7 +43,7 @@ int main()
 
                 cout << "\n>>> Executando: " << nome_pasta << endl;
 
-                // Chama sua função de cálculo
+                // Chama sua função de cálc
                 vector<double> custos = calcula_custo_total(
                     arquivo_operacoes,
                     n_jobs,
