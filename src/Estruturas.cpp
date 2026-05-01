@@ -41,7 +41,7 @@ void Instancia::configurar(int n_maquinas, int n_jobs)
  */
 void Instancia::geraOperToJob(const vector<Operacao> &lista_operacoes)
 {
-    for (int i = 0; i < lista_operacoes.size(); i++)
+    for (size_t i = 0; i < lista_operacoes.size(); i++)
     {
         // Ex: operToJob[ID_DA_OP] = ID_DO_JOB
         operToJob[lista_operacoes[i].id] = lista_operacoes[i].id_job;
@@ -53,7 +53,7 @@ void Instancia::geraOperToJob(const vector<Operacao> &lista_operacoes)
  */
 void Instancia::geraOperToMach(const vector<Operacao> &lista_operacoes)
 {
-    for (int i = 0; i < lista_operacoes.size(); i++)
+    for (size_t i = 0; i < lista_operacoes.size(); i++)
     {
         operToMach[lista_operacoes[i].id] = lista_operacoes[i].maquina;
     }
@@ -64,7 +64,7 @@ void Instancia::geraOperToMach(const vector<Operacao> &lista_operacoes)
  */
 void Instancia::geraTempoProcessamento(const vector<Operacao> &lista_operacoes)
 {
-    for (int i = 0; i < lista_operacoes.size(); i++)
+    for (size_t i = 0; i < lista_operacoes.size(); i++)
     {
         tempoProcessamento[lista_operacoes[i].id] = lista_operacoes[i].tempo_processamento;
     }
@@ -76,7 +76,7 @@ void Instancia::geraTempoProcessamento(const vector<Operacao> &lista_operacoes)
  */
 void Instancia::geraJobOper(const vector<Operacao> &lista_operacoes)
 {
-    for (int i = 0; i < lista_operacoes.size(); i++)
+    for (size_t i = 0; i < lista_operacoes.size(); i++)
     {
         jobOperation[lista_operacoes[i].id_job].push_back(lista_operacoes[i].id);
     }
@@ -88,7 +88,7 @@ void Instancia::geraJobOper(const vector<Operacao> &lista_operacoes)
  */
 void Instancia::geraMachOper(const vector<Operacao> &lista_operacoes)
 {
-    for (int i = 0; i < lista_operacoes.size(); i++)
+    for (size_t i = 0; i < lista_operacoes.size(); i++)
     {
         machOperation[lista_operacoes[i].maquina].push_back(lista_operacoes[i].id);
     }
@@ -102,7 +102,7 @@ void Instancia::geraJobAntecessor()
     for (const auto &fila : jobOperation)
     {
         // Começa do 1 (a primeira operação não tem antecessor)
-        for (int i = 1; i < fila.size(); i++)
+        for (size_t i = 1; i < fila.size(); i++)
         {
             jobAntecessor[fila[i]] = fila[i - 1];
         }
@@ -117,7 +117,7 @@ void Instancia::geraJobSucessor()
     for (const auto &fila : jobOperation)
     {
         // Vai até o penúltimo (a última operação não tem sucessor)
-        for (int i = 0; i < fila.size() - 1; i++)
+        for (size_t i = 0; i < fila.size() - 1; i++)
         {
             jobSucessor[fila[i]] = fila[i + 1];
         }
@@ -131,7 +131,7 @@ void Instancia::geraMachAntecessor()
 {
     for (const auto &fila : machOperation)
     {
-        for (int i = 1; i < fila.size(); i++)
+        for (size_t i = 1; i < fila.size(); i++)
         {
             machAntecessor[fila[i]] = fila[i - 1];
         }
@@ -145,7 +145,7 @@ void Instancia::geraMachSucessor()
 {
     for (const auto &fila : machOperation)
     {
-        for (int i = 0; i < fila.size() - 1; i++)
+        for (size_t i = 0; i < fila.size() - 1; i++)
         {
             machSucessor[fila[i]] = fila[i + 1];
         }

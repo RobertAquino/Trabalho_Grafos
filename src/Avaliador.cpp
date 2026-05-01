@@ -148,7 +148,8 @@ vector<double> avaliador(int n_jobs, const Instancia &instancia,
 
 // Essa função chama a função de avaliador e como base no tempo final de cada job calcula as
 // suas penalidades
-vector<double> calcula_custo_total(string caminho_jobs, string caminho_operation, string caminho_setup, double &makespan)
+vector<double> calcula_custo_total(string caminho_jobs, string caminho_operation, string caminho_setup, double &makespan, int &n_jobs,
+                                   int &n_maquinas)
 {
     // Declara as estruturas de dados
     vector<double> tempo_final_job;
@@ -157,8 +158,6 @@ vector<double> calcula_custo_total(string caminho_jobs, string caminho_operation
     vector<JobInfo> lista_job = jobParser.inicializaParser(caminho_jobs);
     OperationsParser operationsParser;
     vector<Operacao> lista_operacoes = operationsParser.inicializaParser(caminho_operation);
-    int n_jobs = 0;
-    int n_maquinas = 0;
     calculaQuantidadesComponentes(n_jobs, n_maquinas, lista_operacoes);
     Instancia instancia;
     instancia.inicializaEstruturas(caminho_operation, caminho_setup, n_maquinas, n_jobs);

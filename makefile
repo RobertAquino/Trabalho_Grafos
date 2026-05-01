@@ -49,11 +49,11 @@ src/Avaliador.o: src/Avaliador.cpp Bibliotecas/Avaliador.hpp Bibliotecas/Estrutu
 src/Estruturas.o: Bibliotecas/Estruturas.hpp
 	$(CC) $(FLAGS) -c src/Estruturas.cpp -o src/Estruturas.o
 
-# Limpeza de arquivos temporários
+# Limpeza de arquivos temporários (Adaptada para funcionar em Windows e Linux)
 clean:
-	@if exist main.o $(RM) main.o
-	@if exist src\Avaliador.o $(RM_SRC)
-	@if exist $(OUTPUTMAIN) $(RM) $(OUTPUTMAIN)
+	-$(RM) main.o
+	-$(RM_SRC)
+	-$(RM) $(OUTPUTMAIN)
 	@echo Limpeza de arquivos .o e executaveis completa!
 
 # Atalho para compilar e executar

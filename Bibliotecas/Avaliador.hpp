@@ -8,6 +8,7 @@
 std::vector<double> calcula_custo_total(std::string arquivo_jobs,
                                         std::string arquivo_operacoes,
                                         std::string arquivo_setup,
-                                        double &makespan);
+                                        double &makespan, int &n_jobs,
+                                        int &n_maquinas);
 void calculaQuantidadesComponentes(int &n_jobs, int &n_maquinas, const vector<Operacao> &lista_operacoes);
 #endif
