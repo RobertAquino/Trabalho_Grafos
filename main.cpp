@@ -13,8 +13,6 @@ int main()
 {
     int n_jobs = 10;
     int n_machines = 10;
-
-    // Caminho base - Importante: No Windows use barras normais '/' ou duplas '\\'
     string caminho_base = "Pasta do git_Brandimarte/just-in-time-jss-setup-times/instancias_100/";
 
     DIR *dir;
