@@ -4,15 +4,14 @@
 #include <dirent.h>
 #include "./Bibliotecas/Estruturas.hpp"
 #include "./Bibliotecas/Parser_JobInfo.hpp"
-#include "./src/Instancias.cpp"
-#include "./src/Avaliador.cpp"
+#include "./Bibliotecas/Parser_Operation.hpp"
+#include "./Bibliotecas/Parser_Setup.hpp"
+#include "./Bibliotecas/Avaliador.hpp"
 
 using namespace std;
 
 int main()
 {
-    int n_jobs = 10;
-    int n_machines = 10;
     string caminho_base = "Pasta do git_Brandimarte/just-in-time-jss-setup-times/instancias_100/";
 
     DIR *dir;
@@ -38,14 +37,16 @@ int main()
 
                 // Monta o caminho dos arquivos
                 string arquivo_operacoes = caminho_completo + "/operations.csv";
+                string arquivo_setup = caminho_completo + "/setup.csv";
+                string arquivo_jobs = caminho_completo + "/jobs.csv";
 
                 cout << "\n>>> Executando: " << nome_pasta << endl;
 
                 // Chama sua função de cálc
                 vector<double> custos = calcula_custo_total(
+                    arquivo_jobs,
                     arquivo_operacoes,
-                    n_jobs,
-                    n_machines,
+                    arquivo_setup,
                     makespan);
 
                 double soma = 0;

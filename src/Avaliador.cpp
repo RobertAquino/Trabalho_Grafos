@@ -1,6 +1,7 @@
 #include "../Bibliotecas/Estruturas.hpp"
 #include "../Bibliotecas/Parser_Operation.hpp"
 #include "../Bibliotecas/Parser_JobInfo.hpp"
+#include "../Bibliotecas/Parser_Setup.hpp"
 #include <queue>
 
 // calcula o máximo entre dois valores
@@ -8,17 +9,30 @@ double max(double a, double b)
 {
     return (a > b) ? a : b;
 }
+void calculaQuantidadesComponentes(int &n_jobs, int &n_maquinas, const vector<Operacao> &lista_operacoes)
+{
+    int max_job = -1;
+    int max_mach = -1;
 
+    for (size_t i = 0; i < lista_operacoes.size(); i++)
+    {
+        if (lista_operacoes[i].id_job > max_job)
+            max_job = lista_operacoes[i].id_job;
+
+        if (lista_operacoes[i].maquina > max_mach)
+            max_mach = lista_operacoes[i].maquina;
+    }
+    n_jobs = max_job + 1;
+    n_maquinas = max_mach + 1;
+}
 // Esta função é responsável por avaliar a heurística escolhida. Ela basicamente utiliza listas
 // de adjacência para descobrir qual é o tempo final de todas as operações(makespan) e também o tempo
 // final de cada job indivídual, isso será muito importante na hora do cálculo das penalidades
-vector<double> avaliador(int total_operations, string caminho,
-                         int n_jobs, int n_maquinas, const Instancia &instancia,
-                         const vector<JobInfo> &lista_job, double &makespan)
+vector<double> avaliador(int n_jobs, const Instancia &instancia,
+                         const vector<JobInfo> &lista_job, const vector<Operacao> &lista_operacoes, double &makespan)
 {
     // Primeiro declaramos as estruturas de dados
-    OperationsParser operationsParser;
-    vector<Operacao> lista_operacoes = operationsParser.inicializaParser(caminho);
+    int total_operations = lista_operacoes.size();
     // Esse vetor será utilizado para representar a quantidade de pendencias que uma operação tem
     vector<int> grau_entrada;
     grau_entrada.resize(total_operations, 0);
@@ -134,17 +148,23 @@ vector<double> avaliador(int total_operations, string caminho,
 
 // Essa função chama a função de avaliador e como base no tempo final de cada job calcula as
 // suas penalidades
-vector<double> calcula_custo_total(string caminho, int n_jobs, int n_maquinas, double &makespan)
+vector<double> calcula_custo_total(string caminho_jobs, string caminho_operation, string caminho_setup, double &makespan)
 {
     // Declara as estruturas de dados
     vector<double> tempo_final_job;
     // Essa estrutura ao final da função terá o valor final de cada job, com suas multas
-    vector<double> tempo_multas_job(n_jobs, 0);
-    Instancia instancia;
     JobParser jobParser;
-    vector<JobInfo> lista_job = jobParser.inicializaParser(caminho);
-    instancia.inicializaEstruturas(caminho, n_maquinas, n_jobs);
-    tempo_final_job = avaliador((n_jobs * n_maquinas), caminho, n_jobs, n_maquinas, instancia, lista_job, makespan);
+    vector<JobInfo> lista_job = jobParser.inicializaParser(caminho_jobs);
+    OperationsParser operationsParser;
+    vector<Operacao> lista_operacoes = operationsParser.inicializaParser(caminho_operation);
+    int n_jobs = 0;
+    int n_maquinas = 0;
+    calculaQuantidadesComponentes(n_jobs, n_maquinas, lista_operacoes);
+    Instancia instancia;
+    instancia.inicializaEstruturas(caminho_operation, caminho_setup, n_maquinas, n_jobs);
+    vector<double> tempo_multas_job(n_jobs, 0);
+    cout << "Estou aqui " << endl;
+    tempo_final_job = avaliador(n_jobs, instancia, lista_job, lista_operacoes, makespan);
 
     // Esse 'for' passará pelo tempo de cada job e calculará o tempo real com penalidades, através
     // diferença do tempo total para o tempo esperado
@@ -171,6 +191,5 @@ vector<double> calcula_custo_total(string caminho, int n_jobs, int n_maquinas, d
             tempo_multas_job[i] = tempo_final_job[i] + temp;
         }
     }
-
     return tempo_multas_job;
 }

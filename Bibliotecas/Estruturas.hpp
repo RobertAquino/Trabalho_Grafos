@@ -82,7 +82,7 @@ public:
     void geraMachSucessor();
 
     // Função principal que orquestra a leitura e o preenchimento das listas
-    void inicializaEstruturas(std::string caminho, int n_maquinas, int n_jobs);
+    void inicializaEstruturas(std::string caminho_operation, std::string caminho_setup, int n_maquinas, int n_jobs);
     // Prepara o espaço na memória
     void configurar(int n_maquinas, int n_jobs);
 };

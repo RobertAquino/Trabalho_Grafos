@@ -13,6 +13,7 @@ using namespace std;
  */
 void Instancia::configurar(int n_maquinas, int n_jobs)
 {
+    cout << "Configurando memória para " << n_maquinas << " máquinas e " << n_jobs << " jobs..." << endl;
     int total_operations = n_maquinas * n_jobs;
 
     // Redimensiona a matriz 3D de setup [máquina][job_ant][job_atual]
@@ -154,17 +155,16 @@ void Instancia::geraMachSucessor()
 /**
  * @brief Função orquestradora: Chama o parser, configura a memória e gera todos os mapas.
  */
-void Instancia::inicializaEstruturas(string caminho, int n_maquinas, int n_jobs)
+void Instancia::inicializaEstruturas(string caminho_operation, string caminho_setup, int n_maquinas, int n_jobs)
 {
     // 1. Prepara os vetores
     configurar(n_maquinas, n_jobs);
-
     // 2. Lê os dados brutos do arquivo CSV
     OperationsParser operationsParser;
-    vector<Operacao> lista_operacoes = operationsParser.inicializaParser(caminho);
+    vector<Operacao> lista_operacoes = operationsParser.inicializaParser(caminho_operation);
 
     SetupParser parserSetup;
-    parserSetup.carregarSetup(caminho, matriz_setup);
+    parserSetup.carregarSetup(caminho_setup, matriz_setup);
 
     // 3. Converte a lista plana de operações em mapas de acesso rápido
     geraOperToJob(lista_operacoes);
