@@ -5,6 +5,8 @@
 #include "../Bibliotecas/Parser_Operation.hpp"
 #include "../Bibliotecas/Parser_Setup.hpp"
 
+#include <algorithm>
+
 using namespace std;
 
 /**

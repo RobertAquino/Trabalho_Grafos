@@ -14,5 +14,6 @@ public:
 };
 
 double motorBusca(Instancia &instancia, const std::vector<JobInfo> &lista_jobs,
-                  const std::vector<Operacao> lista_operacoes, double &makespan, int &iteracao);
+                  const std::vector<Operacao> lista_operacoes, double &makespan, int &iteracao,
+                  int n_maquinas);
 #endif

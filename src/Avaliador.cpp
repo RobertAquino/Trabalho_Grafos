@@ -65,6 +65,8 @@ vector<double> avaliador(int n_jobs, const Instancia &instancia,
         }
     }
 
+    int operacoes_processadas = 0;
+
     // Enquanto houver uma operação a ser executada, somaremos o tempo inicial de cada operação
     // com sua duração para saber quando uma operação específica terminará. Se esta operação for
     // a última de seu job, adicionamos o seu tempo no vetor 'tempo_final_job'
@@ -134,9 +136,16 @@ vector<double> avaliador(int n_jobs, const Instancia &instancia,
                 fila.push(instancia.machSucessor[atual]);
             }
         }
+        operacoes_processadas++;
+    }
+
+    if (operacoes_processadas < total_operations)
+    {
+        makespan = 999999999.0;                             // Diz para a main que o makespan é absurdo
+        vector<double> tempo_invalido(n_jobs, 999999999.0); // Retorna tempos gigantes
+        return tempo_invalido;                              // O calcula_custo_total vai gerar uma multa bilionária
     }
     // Calcula o makespan
-    makespan = 0;
 
     for (int i = 0; i < n_jobs; i++)
     {
@@ -154,6 +163,15 @@ vector<double> calcula_custo_total(Instancia &instancia, double &makespan, vecto
     tempo_final_job = avaliador(n_jobs, instancia, lista_job, lista_operacoes, makespan);
     vector<double> tempo_multas_job;
     tempo_multas_job.resize(tempo_final_job.size(), 0);
+
+    if (makespan >= 999999990.0)
+    {
+        for (int i = 0; i < n_jobs; i++)
+        {
+            tempo_multas_job[i] = 999999999.0; // Multa bilionária
+        }
+        return tempo_multas_job;
+    }
 
     // Esse 'for' passará pelo tempo de cada job e calculará o tempo real com penalidades, através
     // diferença do tempo total para o tempo esperado

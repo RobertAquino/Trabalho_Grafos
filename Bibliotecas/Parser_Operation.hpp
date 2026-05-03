@@ -57,11 +57,7 @@ public:
 
         arquivo.close();
 
-        sort(lista_operacoes.begin(), lista_operacoes.end(), [](const Operacao &a, const Operacao &b)
-             { return a.id < b.id; });
-
         return lista_operacoes;
     }
 };
-
 #endif
