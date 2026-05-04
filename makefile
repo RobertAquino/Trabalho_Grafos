@@ -3,7 +3,7 @@ MAIN := main
 
 # Lista de objetos (arquivos .o que serão gerados a partir dos .cpp)
 # Note que não incluímos os .hpp aqui, apenas os arquivos que possuem código fonte executável
-OBJECTS := main.o src/Avaliador.o src/Estruturas.o src/BuscaLocal.o
+OBJECTS := main.o src/Avaliador.o src/Estruturas.o src/BuscaTabu.o
 
 # Compilador e Flags
 CC := g++
@@ -38,7 +38,7 @@ $(OUTPUTMAIN): $(OBJECTS)
 # Ele depende do main.cpp e de todos os headers incluídos
 main.o: main.cpp Bibliotecas/Estruturas.hpp Bibliotecas/Parser_JobInfo.hpp \
          Bibliotecas/Parser_Operation.hpp Bibliotecas/Parser_Setup.hpp \
-         Bibliotecas/Avaliador.hpp Bibliotecas/BuscaLocal.hpp
+         Bibliotecas/Avaliador.hpp Bibliotecas/BuscaTabu.hpp
 	$(CC) $(FLAGS) -c main.cpp -o main.o
 
 # Regra para compilar o Avaliador.o
@@ -49,9 +49,9 @@ src/Avaliador.o: src/Avaliador.cpp Bibliotecas/Avaliador.hpp Bibliotecas/Estrutu
 src/Estruturas.o: Bibliotecas/Estruturas.hpp
 	$(CC) $(FLAGS) -c src/Estruturas.cpp -o src/Estruturas.o
 
-# Regra para compilar o BuscaLocal.o (AQUI ESTÁ A NOVIDADE!)
-src/BuscaLocal.o: src/BuscaLocal.cpp Bibliotecas/BuscaLocal.hpp Bibliotecas/Avaliador.hpp Bibliotecas/Estruturas.hpp
-	$(CC) $(FLAGS) -c src/BuscaLocal.cpp -o src/BuscaLocal.o
+# Regra para compilar o BuscaTabu.o (AQUI ESTÁ A NOVIDADE!)
+src/BuscaTabu.o: src/BuscaTabu.cpp Bibliotecas/BuscaTabu.hpp Bibliotecas/Avaliador.hpp Bibliotecas/Estruturas.hpp
+	$(CC) $(FLAGS) -c src/BuscaTabu.cpp -o src/BuscaTabu.o
 
 # Limpeza de arquivos temporários (Adaptada para funcionar em Windows e Linux)
 clean:

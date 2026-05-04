@@ -3,13 +3,13 @@
 #include <string>
 #include <dirent.h>
 #include <fstream>
-#include <iomanip> // Para formatar a saída no terminal (deixar alinhadinho)
+#include <iomanip>
 #include "./Bibliotecas/Estruturas.hpp"
 #include "./Bibliotecas/Parser_JobInfo.hpp"
 #include "./Bibliotecas/Parser_Operation.hpp"
 #include "./Bibliotecas/Parser_Setup.hpp"
 #include "./Bibliotecas/Avaliador.hpp"
-#include "./Bibliotecas/BuscaLocal.hpp"
+#include "./Bibliotecas/BuscaTabu.hpp"
 
 using namespace std;
 
@@ -20,7 +20,6 @@ int main()
     DIR *dir;
     struct dirent *ent;
 
-    // Abre o arquivo CSV e cria o novo cabeçalho (com colunas separadas para FIFO e BL)
     ofstream arquivo_saida("resultados_simulacao.csv");
     if (!arquivo_saida.is_open())
     {
@@ -28,7 +27,7 @@ int main()
         return 1;
     }
 
-    arquivo_saida << "Instancia,Makespan_FIFO,Custo_FIFO,Makespan_BL,Custo_BL,N_Jobs,N_Maquinas,Total_Operacoes\n";
+    arquivo_saida << "Instancia,N_Maquinas,N_Jobs,Total_Operacoes,Makespan_FIFO,Custo_FIFO,Makespan_SPT,Custo_SPT,Makespan_BT,Custo_BT\n";
 
     cout << "=========================================================" << endl;
     cout << "           INICIANDO PROCESSAMENTO EM LOTE               " << endl;
@@ -48,13 +47,9 @@ int main()
                 string arquivo_setup = caminho_completo + "/setup.csv";
                 string arquivo_jobs = caminho_completo + "/jobs.csv";
 
-                // --- TRAVA DE SEGURANÇA ---
-                // Evita que o programa exploda se achar uma pasta sem o operations.csv
                 ifstream testa_arquivo(arquivo_operacoes);
                 if (!testa_arquivo.is_open())
-                {
                     continue;
-                }
                 testa_arquivo.close();
 
                 // ========================================================
@@ -71,8 +66,8 @@ int main()
                 calculaQuantidadesComponentes(n_jobs, n_maquinas, lista_operacoes);
 
                 Instancia instancia;
+                // Inicializa com o Magic Sort (FIFO)
                 instancia.inicializaEstruturas(arquivo_operacoes, arquivo_setup, n_maquinas, n_jobs);
-
                 int total_operacoes = n_jobs * n_maquinas;
 
                 // ========================================================
@@ -80,40 +75,59 @@ int main()
                 // ========================================================
                 double makespan_fifo = 0;
                 vector<double> custos_fifo = calcula_custo_total(instancia, makespan_fifo, lista_jobs, lista_operacoes);
-
-                cout << makespan_fifo << endl;
                 double custo_total_fifo = 0;
                 for (double c : custos_fifo)
-                {
                     custo_total_fifo += c;
-                }
-                cout << custo_total_fifo << endl;
-                // ========================================================
-                // 3. OTIMIZAÇÃO (BUSCA LOCAL)
-                // ========================================================
-                double makespan_bl = 0;
-                int iteracoes_bl = 0;
-                double custo_total_bl = motorBusca(instancia, lista_jobs, lista_operacoes, makespan_bl, iteracoes_bl, n_maquinas);
 
                 // ========================================================
-                // 4. SAÍDA DE DADOS (Terminal e CSV)
+                // 3. AVALIAÇÃO DA SOLUÇÃO INICIAL (SPT)
+                // ========================================================
+                Solucao solucao_spt;
+                transformaSolucaoSPT(instancia, lista_jobs, lista_operacoes, solucao_spt, n_maquinas);
+
+                // MUDANÇA CRUCIAL: Atualizamos o Grafo da Instância na Main
+                alteraMachAntecessor(instancia, solucao_spt);
+                alteraMachSucessor(instancia, solucao_spt);
+
+                double makespan_spt = 0;
+                // Calcula o custo com o Grafo já atualizado para o SPT
+                vector<double> custos_spt = calcula_custo_total(instancia, makespan_spt, lista_jobs, lista_operacoes);
+                double custo_total_spt = 0;
+                for (double c : custos_spt)
+                    custo_total_spt += c;
+
+                // ========================================================
+                // 4. OTIMIZAÇÃO (BUSCA TABU)
+                // ========================================================
+                double makespan_bt = 0;
+                int iteracoes_bt = 0;
+
+                // O Motor recebe a fábrica pronta (SPT) e o Grafo já está alinhado com ela
+                double custo_total_bt = motorBusca(instancia, lista_jobs, lista_operacoes, makespan_bt, iteracoes_bt, solucao_spt);
+
+                // ========================================================
+                // 5. SAÍDA DE DADOS (Terminal e CSV)
                 // ========================================================
                 cout << ">>> " << nome_pasta << endl;
                 cout << "    [Config] Jobs: " << n_jobs << " | Maquinas: " << n_maquinas << " | Op: " << total_operacoes << endl;
-                cout << fixed << setprecision(2); // Formata os números quebres com 2 casas decimais
+                cout << fixed << setprecision(2);
                 cout << "    [FIFO]   Makespan: " << makespan_fifo << " | Custo: " << custo_total_fifo << endl;
-                cout << "    [B.L.]   Makespan: " << makespan_bl << " | Custo: " << custo_total_bl << " | Passos: " << iteracoes_bl << "\n"
+                cout << "    [SPT]    Makespan: " << makespan_spt << " | Custo: " << custo_total_spt << endl;
+                cout << "    [Tabu]   Makespan: " << makespan_bt << " | Custo: " << custo_total_bt << " | Passos(Total): " << iteracoes_bt << "\n"
                      << endl;
 
-                // Salva os dados no CSV na ordem correta do cabeçalho
+                // Salva os dados no CSV
+                // Salva os dados no CSV na exata ordem do cabeçalho
                 arquivo_saida << nome_pasta << ","
+                              << n_maquinas << ","
+                              << n_jobs << ","
+                              << total_operacoes << ","
                               << makespan_fifo << ","
                               << custo_total_fifo << ","
-                              << makespan_bl << ","
-                              << custo_total_bl << ","
-                              << n_jobs << ","
-                              << n_maquinas << ","
-                              << total_operacoes << "\n";
+                              << makespan_spt << ","
+                              << custo_total_spt << ","
+                              << makespan_bt << ","
+                              << custo_total_bt << "\n";
             }
         }
         closedir(dir);
