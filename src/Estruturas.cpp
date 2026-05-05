@@ -20,7 +20,6 @@ void Instancia::configurar(int n_maquinas, int n_jobs)
 
     // Redimensiona a matriz 3D de setup [máquina][job_ant][job_atual]
     matriz_setup.resize(n_maquinas, vector<vector<int>>(n_jobs, vector<int>(n_jobs, 0)));
-    estado_inicial.resize(n_maquinas, 0);
 
     // Mapeamentos diretos: cada posição do vetor corresponde ao ID de uma operação
     operToJob.resize(total_operations, 0);

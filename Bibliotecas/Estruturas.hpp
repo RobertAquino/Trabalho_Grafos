@@ -15,7 +15,6 @@ public:
     double due_date;          // Prazo de entrega (Data de vencimento)
     double earliness_penalty; // Multa por terminar antes do prazo (estoque)
     double tardiness_penalty; // Multa por terminar após o prazo (atraso)
-    double flow_time_penalty; // Penalidade baseada no tempo total de permanência na fábrica
 };
 
 /**
@@ -34,8 +33,7 @@ public:
 class Instancia
 {
 public:
-    std::vector<std::vector<std::vector<int>>> matriz_setup; // matriz_setup[maquina][job_anterior][job_atual]
-    std::vector<int> estado_inicial;                         // Estado de cada máquina antes de começar
+    std::vector<std::vector<std::vector<int>>> matriz_setup; // matriz_setup[maquina][job_anterior][job_atual]                       // Estado de cada máquina antes de começar
 
     // --- Mapeamentos Diretos (Acesso O(1)) ---
     // Úteis para quando você tem o ID de uma operação e quer saber um detalhe dela instantaneamente

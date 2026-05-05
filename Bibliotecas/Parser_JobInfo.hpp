@@ -26,6 +26,7 @@ public:
             return lista_job;
         }
 
+        double temp;
         string linha;
 
         // Pula o cabeçalho
@@ -53,7 +54,8 @@ public:
             job_atual.tardiness_penalty = std::stod(dado);
 
             getline(separador, dado, ',');
-            job_atual.flow_time_penalty = std::stod(dado);
+            temp = std::stod(dado);
+            temp++;
 
             lista_job.push_back(job_atual);
         }

@@ -47,35 +47,6 @@ public:
         }
         arquivo.close();
     }
-
-    void carregarInitialSetup(string caminho, Instancia &objetoSetup)
-    {
-        ifstream arquivo(caminho);
-        string linha;
-
-        if (!arquivo.is_open())
-        {
-            cout << "Erro ao abrir: " << caminho << endl;
-            return;
-        }
-
-        getline(arquivo, linha);
-
-        while (getline(arquivo, linha))
-        {
-            if (linha.empty() || linha.find_first_not_of(" \t\r\n") == string::npos)
-                continue;
-
-            stringstream ss(linha);
-            string m, j;
-
-            if (getline(ss, m, ',') && getline(ss, j))
-            {
-                objetoSetup.estado_inicial[stoi(m)] = stoi(j);
-            }
-        }
-        arquivo.close();
-    }
 };
 
 #endif
