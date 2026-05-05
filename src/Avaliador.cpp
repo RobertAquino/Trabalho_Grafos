@@ -1,14 +1,19 @@
+#include "../Bibliotecas/Avaliador.hpp"
 #include "../Bibliotecas/Estruturas.hpp"
 #include "../Bibliotecas/Parser_Operation.hpp"
 #include "../Bibliotecas/Parser_JobInfo.hpp"
 #include "../Bibliotecas/Parser_Setup.hpp"
 #include <queue>
+#include <vector>
+
+using namespace std;
 
 // calcula o máximo entre dois valores
 double max(double a, double b)
 {
     return (a > b) ? a : b;
 }
+
 void calculaQuantidadesComponentes(int &n_jobs, int &n_maquinas, const vector<Operacao> &lista_operacoes)
 {
     int max_job = -1;
@@ -25,14 +30,21 @@ void calculaQuantidadesComponentes(int &n_jobs, int &n_maquinas, const vector<Op
     n_jobs = max_job + 1;
     n_maquinas = max_mach + 1;
 }
+
 // Esta função é responsável por avaliar a heurística escolhida. Ela basicamente utiliza listas
 // de adjacência para descobrir qual é o tempo final de todas as operações(makespan) e também o tempo
 // final de cada job indivídual, isso será muito importante na hora do cálculo das penalidades
-vector<double> avaliador(int n_jobs, const Instancia &instancia,
+vector<double> avaliador(vector<int> &lista_ordenacao, vector<int> &predecessor_critico, int n_jobs, const Instancia &instancia,
                          const vector<JobInfo> &lista_job, const vector<Operacao> &lista_operacoes, double &makespan)
 {
+    // CORREÇÃO: Limpa a lista para garantir que não acumule a ordem das rodadas anteriores
+    lista_ordenacao.clear();
+
     // Primeiro declaramos as estruturas de dados
     int total_operations = lista_operacoes.size();
+
+    predecessor_critico.assign(total_operations, -1);
+
     // Esse vetor será utilizado para representar a quantidade de pendencias que uma operação tem
     vector<int> grau_entrada;
     grau_entrada.resize(total_operations, 0);
@@ -76,12 +88,16 @@ vector<double> avaliador(int n_jobs, const Instancia &instancia,
         int atual = fila.front();
         fila.pop();
 
+        lista_ordenacao.push_back(atual);
+
         double inicio_op_atual = 0;
+        int culpado_job = -1;
 
         // Se o operação atual possuir um antecessor, o tempo inicial dele é o tempo final do antecessor
         if (instancia.jobAntecessor[atual] != -1)
         {
             inicio_op_atual = tempo_fim_operacao[instancia.jobAntecessor[atual]];
+            culpado_job = instancia.jobAntecessor[atual];
         }
         // Se o operação não possui um antecessor, o tempo inicial dele é o tempo que a primeira
         // operação do job chega, o 'release_date'.
@@ -91,15 +107,28 @@ vector<double> avaliador(int n_jobs, const Instancia &instancia,
         }
 
         double desocupa_maquina_atual = 0;
+        int culpado_mach = -1;
 
         // Uma vez que a operação atual pode não depender apenas de uma operação anterior de mesmo job,
         // mas de uma máquina que foi usada anteriormente por uma operação de outro job,
         // o tempo inicial é o valor máximo entre o tempo final da operação do mesmo job ou da
         // operação de job diferente
         if (instancia.machAntecessor[atual] != -1)
+        {
             desocupa_maquina_atual = tempo_fim_operacao[instancia.machAntecessor[atual]];
+            culpado_mach = instancia.machAntecessor[atual];
+        }
 
-        tempo_inicio_operacao[atual] = max(inicio_op_atual, desocupa_maquina_atual);
+        if (inicio_op_atual > desocupa_maquina_atual)
+        {
+            tempo_inicio_operacao[atual] = inicio_op_atual;
+            predecessor_critico[atual] = culpado_job;
+        }
+        else
+        {
+            tempo_inicio_operacao[atual] = desocupa_maquina_atual;
+            predecessor_critico[atual] = culpado_mach;
+        }
 
         // O tempo final da operação atual é a soma do tempo inicial do mesmo + o tempo de processamento
         //+ o tempo de setup, se o tempo setup existir
@@ -155,12 +184,13 @@ vector<double> avaliador(int n_jobs, const Instancia &instancia,
     return tempo_final_job;
 }
 
-vector<double> calcula_custo_total(Instancia &instancia, double &makespan, vector<JobInfo> lista_job, vector<Operacao> lista_operacoes)
+// CORREÇÃO: "const" adicionado nos dois últimos parâmetros para bater certinho com o .hpp e com a main
+vector<double> calcula_custo_total(vector<int> &lista_ordenacao, vector<int> &predecessor_critico, Instancia &instancia, double &makespan, const vector<JobInfo> &lista_job, const vector<Operacao> &lista_operacoes)
 {
     // Declara as estruturas de dados
     vector<double> tempo_final_job;
     int n_jobs = lista_job.size();
-    tempo_final_job = avaliador(n_jobs, instancia, lista_job, lista_operacoes, makespan);
+    tempo_final_job = avaliador(lista_ordenacao, predecessor_critico, n_jobs, instancia, lista_job, lista_operacoes, makespan);
     vector<double> tempo_multas_job;
     tempo_multas_job.resize(tempo_final_job.size(), 0);
 
@@ -199,4 +229,145 @@ vector<double> calcula_custo_total(Instancia &instancia, double &makespan, vecto
         }
     }
     return tempo_multas_job;
+}
+void resolve_grafo_professor()
+{
+    int n = 15;
+
+    vector<vector<int>> adj(n + 1);
+    vector<int> grau_entrada(n + 1, 0);
+
+    // ARESTAS CORRIGIDAS DE ACORDO COM O GABARITO VISUAL
+    vector<pair<int, int>> arestas = {
+        {4, 3}, {4, 1}, {7, 10}, {7, 8}, {10, 3}, {10, 1}, {8, 2}, {8, 14}, // <--- Aresta longa corrigida
+        {3, 5},
+        {1, 11},
+        {1, 2}, // <--- Dependência do 2 corrigida
+        {2, 12},
+        {5, 15},
+        {5, 14},
+        {11, 15},
+        {11, 14},
+        {14, 13},
+        {12, 13},
+        {12, 9},
+        {15, 6},
+        {15, 9}, // <--- Dependência do 9 corrigida
+        {13, 6}};
+
+    for (auto aresta : arestas)
+    {
+        adj[aresta.first].push_back(aresta.second);
+        grau_entrada[aresta.second]++;
+    }
+
+    queue<int> fila;
+    vector<int> tempo_fim(n + 1, 0);
+    vector<int> predecessor(n + 1, -1);
+    vector<int> ordem_topologica;
+
+    for (int i = 1; i <= n; i++)
+    {
+        if (grau_entrada[i] == 0)
+            fila.push(i);
+    }
+
+    while (!fila.empty())
+    {
+        int atual = fila.front();
+        fila.pop();
+        ordem_topologica.push_back(atual);
+
+        for (int vizinho : adj[atual])
+        {
+            // Se encontrar um caminho MAIOR, ele atualiza a culpa e o tamanho.
+            // É isso que vai fazer ele pular de 4 para 5 saltos no nó 9!
+            if (tempo_fim[atual] + 1 > tempo_fim[vizinho])
+            {
+                tempo_fim[vizinho] = tempo_fim[atual] + 1;
+                predecessor[vizinho] = atual;
+            }
+            grau_entrada[vizinho]--;
+            if (grau_entrada[vizinho] == 0)
+                fila.push(vizinho);
+        }
+    }
+
+    int comprimento_maximo = 0;
+    int ultima_op_global = -1;
+
+    for (int i = 1; i <= n; i++)
+    {
+        if (tempo_fim[i] > comprimento_maximo)
+        {
+            comprimento_maximo = tempo_fim[i];
+            ultima_op_global = i;
+        }
+    }
+
+    vector<int> caminho_global;
+    int rastreio = ultima_op_global;
+
+    while (rastreio != -1)
+    {
+        caminho_global.push_back(rastreio);
+        rastreio = predecessor[rastreio];
+    }
+    reverse(caminho_global.begin(), caminho_global.end());
+
+    vector<int> finais_de_linha_visuais = {6, 13, 9};
+
+    ofstream arquivo_relatorio("resposta_grafos_professor.txt");
+    if (arquivo_relatorio.is_open())
+    {
+        arquivo_relatorio << "=========================================================\n";
+        arquivo_relatorio << "RESOLUCAO DA PROVA: GRAFO TEORICO\n";
+        arquivo_relatorio << "=========================================================\n\n";
+
+        arquivo_relatorio << "[ REQUISITO 1 ] Ordem Topologica dos Vertices:\n -> ";
+        for (size_t i = 0; i < ordem_topologica.size(); i++)
+        {
+            arquivo_relatorio << ordem_topologica[i];
+            if (i < ordem_topologica.size() - 1)
+                arquivo_relatorio << ", ";
+        }
+        arquivo_relatorio << "\n\n";
+
+        arquivo_relatorio << "[ REQUISITO 2 ] Comprimento do Caminho Maximo: " << comprimento_maximo << " saltos (arestas)\n\n";
+
+        arquivo_relatorio << "[ REQUISITO 3 ] Caminho Maximo Global (Minimal ao Maximal):\n -> ";
+        for (size_t i = 0; i < caminho_global.size(); i++)
+        {
+            arquivo_relatorio << caminho_global[i];
+            if (i < caminho_global.size() - 1)
+                arquivo_relatorio << " -> ";
+        }
+        arquivo_relatorio << "\n\n";
+
+        arquivo_relatorio << "[ REQUISITO 4 ] Caminhos Maximos para o Final de Cada Linha do Desenho:\n";
+        for (int maximal : finais_de_linha_visuais)
+        {
+            vector<int> caminho_individual;
+            int r = maximal;
+
+            while (r != -1)
+            {
+                caminho_individual.push_back(r);
+                r = predecessor[r];
+            }
+            reverse(caminho_individual.begin(), caminho_individual.end());
+
+            arquivo_relatorio << " -> Final da Linha (No " << maximal << "): ";
+            for (size_t i = 0; i < caminho_individual.size(); i++)
+            {
+                arquivo_relatorio << caminho_individual[i];
+                if (i < caminho_individual.size() - 1)
+                    arquivo_relatorio << " -> ";
+            }
+            arquivo_relatorio << " (Comprimento: " << tempo_fim[maximal] << ")\n";
+        }
+
+        arquivo_relatorio << "\n";
+        arquivo_relatorio.close();
+    }
 }

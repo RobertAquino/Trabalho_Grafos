@@ -133,7 +133,7 @@ vector<Movimento> geraVizinhos(Solucao &atual)
     return vizinhos;
 }
 
-double motorBusca(Instancia &instancia, const std::vector<JobInfo> &lista_jobs,
+double motorBusca(std::vector<int> &lista_ordenacao, Instancia &instancia, const std::vector<JobInfo> &lista_jobs,
                   const std::vector<Operacao> &lista_operacoes, double &makespan, int &iteracao,
                   Solucao solucao_inicial)
 {
@@ -142,10 +142,12 @@ double motorBusca(Instancia &instancia, const std::vector<JobInfo> &lista_jobs,
     // Criamos um makespan temporário
     double makespan_temp = 0;
 
+    vector<int> predecessor_temporario;
+
     // Cria a STP (Shortest Processing Time)
 
     // Calculamos o custo total da nossa fifo e o makespan, que inicialmente é a melhor solucao
-    vector<double> multas_inicial = calcula_custo_total(instancia, makespan_temp, lista_jobs, lista_operacoes);
+    vector<double> multas_inicial = calcula_custo_total(lista_ordenacao, predecessor_temporario, instancia, makespan_temp, lista_jobs, lista_operacoes);
     double melhor_custo_global = somatorioJob(multas_inicial);
     double makespan_melhor_global = makespan_temp;
 
@@ -195,7 +197,7 @@ double motorBusca(Instancia &instancia, const std::vector<JobInfo> &lista_jobs,
             alteraMachAntecessor(instancia, proxima_solucao);
             alteraMachSucessor(instancia, proxima_solucao);
 
-            vector<double> multas_proxima_solucao = calcula_custo_total(instancia, makespan_temp, lista_jobs, lista_operacoes);
+            vector<double> multas_proxima_solucao = calcula_custo_total(lista_ordenacao, predecessor_temporario, instancia, makespan_temp, lista_jobs, lista_operacoes);
             double custo_vizinho = somatorioJob(multas_proxima_solucao);
 
             // Se o movimento gerar um ciclo eu nem analiso
@@ -251,8 +253,7 @@ double motorBusca(Instancia &instancia, const std::vector<JobInfo> &lista_jobs,
     alteraMachAntecessor(instancia, melhor_solucao_global);
     alteraMachSucessor(instancia, melhor_solucao_global);
 
-    calcula_custo_total(instancia, makespan, lista_jobs, lista_operacoes);
+    calcula_custo_total(lista_ordenacao, predecessor_temporario, instancia, makespan, lista_jobs, lista_operacoes);
 
     return melhor_custo_global;
-    ;
 }
