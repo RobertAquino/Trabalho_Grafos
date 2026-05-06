@@ -19,6 +19,7 @@ void swap(int &a, int &b)
     a = b;
     b = temp;
 }
+// Atualizamos os machAntecessor e machSucessor para garantir a validade do algoritmo de Kahn
 void alteraMachAntecessor(Instancia &instancia, Solucao &solucao)
 {
     for (const auto &fila : solucao.matriz_solucao)
@@ -33,6 +34,7 @@ void alteraMachAntecessor(Instancia &instancia, Solucao &solucao)
         }
     }
 }
+
 void alteraMachSucessor(Instancia &instancia, Solucao &solucao)
 {
     for (const auto &fila : solucao.matriz_solucao)
@@ -47,44 +49,30 @@ void alteraMachSucessor(Instancia &instancia, Solucao &solucao)
         }
     }
 }
+
 void transformaSolucaoSPT(const Instancia &instancia, const vector<JobInfo> &lista_jobs, const vector<Operacao> &lista_operacoes, Solucao &solucao, int n_maquinas)
 {
-    // Eu inicializo a matriz
     solucao.matriz_solucao.clear();
     solucao.matriz_solucao.resize(n_maquinas);
-
     int n_jobs = lista_jobs.size();
-
-    // Esse vetor é responsável por guardar a quantidade de operações de cada job que já foram analisadas
     vector<int> progresso_job(n_jobs, 0);
 
-    // Variáveis de controle para o loop
     int total_inseridas = 0;
     int total_ops = lista_operacoes.size();
 
     while (total_inseridas < total_ops)
     {
-
-        // Variáveis usadas para armazenar o melhor tempo,job e operação
         int melhor_op = -1;
         int melhor_job = -1;
         double menor_tempo = 999999999.0;
 
-        // O for passa por todas as primeiras i operacoes de cada job, tentando encontrar a melhor operacao
+        // Loop que passa pelas operações de cada job para encontrar a melhor operação
         for (int j = 0; j < n_jobs; j++)
         {
-
-            // Esse 'if' compara se ainda existe uma operação de um job que não foi analisada
             if (progresso_job[j] < (int)instancia.jobOperation[j].size())
             {
-
-                // Pegamos o ID da operação que está na atual do job a ser analisada
                 int op_id = instancia.jobOperation[j][progresso_job[j]];
-
-                // Calculamos o tempo da operacao
                 double tempo_op = lista_operacoes[op_id].tempo_processamento;
-
-                // Comparamos se a operacao atual e a melhor encontrada até agora
                 if (tempo_op < menor_tempo)
                 {
                     menor_tempo = tempo_op;
@@ -102,6 +90,7 @@ void transformaSolucaoSPT(const Instancia &instancia, const vector<JobInfo> &lis
         total_inseridas++;
     }
 }
+
 double somatorioJob(vector<double> multas)
 {
     double soma = 0;
@@ -111,8 +100,10 @@ double somatorioJob(vector<double> multas)
 
     return soma;
 }
+
 vector<Movimento> geraVizinhos(Solucao &atual)
 {
+    // Cria uma vizinhança
     vector<Movimento> vizinhos;
     for (size_t maquina_atual = 0; maquina_atual < atual.matriz_solucao.size(); maquina_atual++)
     {
@@ -137,14 +128,9 @@ double motorBusca(std::vector<int> &lista_ordenacao, Instancia &instancia, const
                   const std::vector<Operacao> &lista_operacoes, double &makespan, int &iteracao,
                   Solucao solucao_inicial)
 {
-    // Esse vetor será usado para passar por toda a possíveis soluções(vizinhança) de uma solucao atual
     vector<Movimento> vizinhanca;
-    // Criamos um makespan temporário
     double makespan_temp = 0;
-
     vector<int> predecessor_temporario;
-
-    // Cria a STP (Shortest Processing Time)
 
     // Calculamos o custo total da nossa fifo e o makespan, que inicialmente é a melhor solucao
     vector<double> multas_inicial = calcula_custo_total(lista_ordenacao, predecessor_temporario, instancia, makespan_temp, lista_jobs, lista_operacoes);
@@ -157,12 +143,9 @@ double motorBusca(std::vector<int> &lista_ordenacao, Instancia &instancia, const
 
     int total_operacoes = lista_operacoes.size();
 
-    // Criamos a nossa lista tabu(matriz), que será responsável por restringir alguns movimentos, por um certo
-    // período de tempo. Fazemos isso para tentar fugir dos mínimos locais
     vector<vector<int>> lista_tabu(total_operacoes, vector<int>(total_operacoes, 0));
 
-    // Defino os parametros da nossa Busca Tabu, a supensão de cada movimento, e quantidade de passos que ele poderá
-    // dar sem conseguir uma melhora.
+    // Definição de parametros da Busca Tabu, como suspensão de cada movimento e quantidade de passos sem uma melhora
     int tempo_suspensao = 10;
     int max_iteracoes_sem_melhora = 150;
     int iteracoes_sem_melhora = 0;
@@ -204,14 +187,12 @@ double motorBusca(std::vector<int> &lista_ordenacao, Instancia &instancia, const
             if (custo_vizinho >= 999999990.0)
                 continue;
 
-            // Analisamos se o movimento está suspenso
             bool eh_tabu = (lista_tabu[o1][o2] >= iteracao);
 
             // Se o movimento estiver suspenso mais ele ainda sim melhor o cust_global, nós forçamos a Busca Tabu permitir o movimento
             if (eh_tabu && custo_vizinho < melhor_custo_global)
                 eh_tabu = false;
 
-            // Se o movimento não fizer parte da lista tabu, atualizamos o melhor vizinho
             if (!eh_tabu && custo_vizinho < melhor_custo_rodada)
             {
                 melhor_custo_rodada = custo_vizinho;
@@ -223,7 +204,6 @@ double motorBusca(std::vector<int> &lista_ordenacao, Instancia &instancia, const
             }
         }
 
-        // Se ele não achar nenhum vizinho válido, eu testo a vizinha de outra solucao
         if (!achou_movimento_valido)
             break;
 
@@ -247,7 +227,6 @@ double motorBusca(std::vector<int> &lista_ordenacao, Instancia &instancia, const
         }
     }
 
-    // DEVOLVE PARA A MAIN O MAKESPAN LIMPO
     makespan = makespan_melhor_global;
 
     alteraMachAntecessor(instancia, melhor_solucao_global);

@@ -9,9 +9,9 @@
 
 using namespace std;
 
-/**
- * @brief Prepara a memória redimensionando todos os vetores da classe Instancia.
- * É o primeiro passo para evitar erros de "out of range" (acesso a memória inválida).
+/*
+  Prepara a memória redimensionando todos os vetores da classe Instancia.
+  É o primeiro passo para evitar erros de "out of range" (acesso a memória inválida).
  */
 void Instancia::configurar(int n_maquinas, int n_jobs)
 {
@@ -37,20 +37,20 @@ void Instancia::configurar(int n_maquinas, int n_jobs)
     machOperation.resize(n_maquinas);
 }
 
-/**
- * @brief Cria um mapa rápido para descobrir o Job de uma operação usando apenas o ID dela.
- */
+/*
+Cria um mapa rápido para descobrir o Job de uma operação usando apenas o ID dela.
+*/
 void Instancia::geraOperToJob(const vector<Operacao> &lista_operacoes)
 {
     for (size_t i = 0; i < lista_operacoes.size(); i++)
     {
-        // Ex: operToJob[ID_DA_OP] = ID_DO_JOB
+        // operToJob[ID_DA_OP] = ID_DO_JOB
         operToJob[lista_operacoes[i].id] = lista_operacoes[i].id_job;
     }
 }
 
-/**
- * @brief Cria um mapa rápido para descobrir em qual máquina uma operação deve rodar.
+/*
+  Cria um mapa rápido para descobrir em qual máquina uma operação deve rodar.
  */
 void Instancia::geraOperToMach(const vector<Operacao> &lista_operacoes)
 {
@@ -60,8 +60,8 @@ void Instancia::geraOperToMach(const vector<Operacao> &lista_operacoes)
     }
 }
 
-/**
- * @brief Armazena o tempo de processamento de cada operação em um vetor indexado pelo ID.
+/*
+  Armazena o tempo de processamento de cada operação em um vetor indexado pelo ID.
  */
 void Instancia::geraTempoProcessamento(const vector<Operacao> &lista_operacoes)
 {
@@ -71,9 +71,9 @@ void Instancia::geraTempoProcessamento(const vector<Operacao> &lista_operacoes)
     }
 }
 
-/**
- * @brief Agrupa os IDs das operações dentro de seus respectivos Jobs.
- * Resulta em: jobOperation[0] = {op0, op1, op2...}
+/*
+   Agrupa os IDs das operações dentro de seus respectivos Jobs.
+   Resulta em: jobOperation[0] = {op0, op1, op2...}
  */
 void Instancia::geraJobOper(const vector<Operacao> &lista_operacoes)
 {
@@ -83,9 +83,9 @@ void Instancia::geraJobOper(const vector<Operacao> &lista_operacoes)
     }
 }
 
-/**
- * @brief Agrupa os IDs das operações dentro de suas respectivas Máquinas.
- * Resulta em: machOperation[0] = {op5, op12, op18...}
+/*
+   Agrupa os IDs das operações dentro de suas respectivas Máquinas.
+   Resulta em: machOperation[0] = {op5, op12, op18...}
  */
 void Instancia::geraMachOper(const vector<Operacao> &lista_operacoes)
 {
@@ -95,8 +95,8 @@ void Instancia::geraMachOper(const vector<Operacao> &lista_operacoes)
     }
 }
 
-/**
- * @brief Define a precedência linear dentro de cada Job.
+/*
+  Define a precedência linear dentro de cada Job.
  */
 void Instancia::geraJobAntecessor()
 {
@@ -110,8 +110,8 @@ void Instancia::geraJobAntecessor()
     }
 }
 
-/**
- * @brief Define a sucessão linear dentro de cada Job.
+/*
+  Define a sucessão linear dentro de cada Job.
  */
 void Instancia::geraJobSucessor()
 {
@@ -125,8 +125,8 @@ void Instancia::geraJobSucessor()
     }
 }
 
-/**
- * @brief Define a ordem de processamento na máquina (quem veio antes na fila).
+/*
+  Define a ordem de processamento na máquina (quem veio antes na fila).
  */
 void Instancia::geraMachAntecessor()
 {
@@ -139,8 +139,8 @@ void Instancia::geraMachAntecessor()
     }
 }
 
-/**
- * @brief Define a ordem de processamento na máquina (quem será o próximo).
+/*
+  Define a ordem de processamento na máquina (quem será o próximo).
  */
 void Instancia::geraMachSucessor()
 {
@@ -153,8 +153,8 @@ void Instancia::geraMachSucessor()
     }
 }
 
-/**
- * @brief Função orquestradora: Chama o parser, configura a memória e gera todos os mapas.
+/*
+  Função orquestradora: Chama o parser, configura a memória e gera todos os mapas.
  */
 void Instancia::inicializaEstruturas(string caminho_operation, string caminho_setup, int n_maquinas, int n_jobs)
 {

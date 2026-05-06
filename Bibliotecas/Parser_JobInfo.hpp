@@ -13,7 +13,6 @@ using namespace std;
 class JobParser
 {
 public:
-    // Colocando a função diretamente dentro da classe evita erros de Linkagem!
     vector<JobInfo> inicializaParser(std::string caminho)
     {
         vector<JobInfo> lista_job;

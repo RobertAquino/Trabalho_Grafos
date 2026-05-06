@@ -2,15 +2,15 @@
 RESOLUCAO DA PROVA: GRAFO TEORICO
 =========================================================
 
-[ REQUISITO 1 ] Ordem Topologica dos Vertices:
+Ordem Topologica dos Vertices:
  -> 4, 7, 10, 8, 3, 1, 5, 11, 2, 15, 14, 12, 13, 9, 6
 
-[ REQUISITO 2 ] Comprimento do Caminho Maximo: 6 saltos (arestas)
+Comprimento do Caminho Maximo: 6 saltos (arestas)
 
-[ REQUISITO 3 ] Caminho Maximo Global (Minimal ao Maximal):
+Caminho Maximo Global (Minimal ao Maximal):
  -> 7 -> 10 -> 3 -> 5 -> 14 -> 13 -> 6
 
-[ REQUISITO 4 ] Caminhos Maximos para o Final de Cada Linha do Desenho:
+Caminhos Maximos para o Final de Cada Linha do Desenho:
  -> Final da Linha (No 6): 7 -> 10 -> 3 -> 5 -> 14 -> 13 -> 6 (Comprimento: 6)
  -> Final da Linha (No 13): 7 -> 10 -> 3 -> 5 -> 14 -> 13 (Comprimento: 5)
  -> Final da Linha (No 9): 7 -> 10 -> 3 -> 5 -> 15 -> 9 (Comprimento: 5)
